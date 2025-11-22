@@ -108,7 +108,7 @@ export const CityMap = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom, center]); // Add center to dependencies
+  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom, center]);
 
   return (
     <div className="relative w-full h-full">
