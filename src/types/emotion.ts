@@ -21,12 +21,12 @@ export interface EmotionSignal {
   timeOfDay: TimeOfDay;
 }
 
-export const EMOTION_CONFIG: Record<EmotionType, { emoji: string; color: string; label: string }> = {
-  happy: { emoji: "😊", color: "emotion-happy", label: "Happy" },
-  neutral: { emoji: "😐", color: "emotion-neutral", label: "Neutral" },
-  sad: { emoji: "😢", color: "emotion-sad", label: "Sad" },
-  stressed: { emoji: "😰", color: "emotion-stressed", label: "Stressed" },
-  calm: { emoji: "😌", color: "emotion-calm", label: "Calm" },
-  energetic: { emoji: "⚡", color: "emotion-energetic", label: "Energetic" },
-  tired: { emoji: "😴", color: "emotion-tired", label: "Tired" },
+export const EMOTION_CONFIG: Record<EmotionType, { icon: string; color: string; label: string }> = {
+  happy: { icon: "Smile", color: "emotion-happy", label: "Happy" },
+  neutral: { icon: "Minus", color: "emotion-neutral", label: "Neutral" },
+  sad: { icon: "Frown", color: "emotion-sad", label: "Sad" },
+  stressed: { icon: "Zap", color: "emotion-stressed", label: "Stressed" },
+  calm: { icon: "Heart", color: "emotion-calm", label: "Calm" },
+  energetic: { icon: "Flame", color: "emotion-energetic", label: "Energetic" },
+  tired: { icon: "Moon", color: "emotion-tired", label: "Tired" },
 };
