@@ -102,7 +102,7 @@ const ReportSubmit = () => {
                     key={option.id}
                     className={`flex-1 p-4 cursor-pointer transition-all hover:scale-105 ${
                       selectedSignal === option.id
-                        ? "ring-2 ring-primary bg-primary/5"
+                        ? "ring-2 ring-primary bg-primary/20"
                         : "hover:border-primary/50"
                     }`}
                     onClick={() => setSelectedSignal(option.id)}
