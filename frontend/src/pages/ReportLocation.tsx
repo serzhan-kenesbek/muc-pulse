@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CityMap } from "@/components/CityMap";
+import { LocationMap } from "@/components/LocationMap";
 import { Heart, MapPin, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
@@ -126,7 +126,7 @@ const ReportLocation = () => {
 
         {/* Map - FIX 3: Added h-[400px] instead of min-h to force explicit height */}
         <div className="w-full h-[400px] rounded-lg overflow-hidden border mb-4 relative bg-muted/20">
-          <CityMap
+          <LocationMap
             onLocationSelect={handleMapClick}
             selectMode={locationMethod === "manual"}
             maxBounds={MUNICH_BOUNDS} // Use MUNICH_BOUNDS from config
