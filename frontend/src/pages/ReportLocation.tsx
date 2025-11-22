@@ -5,12 +5,7 @@ import { Card } from "@/components/ui/card";
 import { CityMap } from "@/components/CityMap";
 import { Heart, MapPin, Navigation } from "lucide-react";
 import { toast } from "sonner";
-
-// FIX 1: Move constants OUTSIDE the component so they don't recreate on every render
-const MUNICH_BOUNDS: [[number, number], [number, number]] = [
-  [11.3600, 48.0616], 
-  [11.7229, 48.2480]
-];
+import { MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
 
 const ReportLocation = () => {
   const navigate = useNavigate();
@@ -139,7 +134,8 @@ const ReportLocation = () => {
             signals={[]}
             onLocationSelect={handleMapClick}
             selectMode={locationMethod === "manual"}
-            maxBounds={MUNICH_BOUNDS} // Passing the constant, not a new array
+            maxBounds={MUNICH_BOUNDS} // Use MUNICH_BOUNDS from config
+            minZoom={MAP_DEFAULTS.minZoom}
           />
         </div>
 

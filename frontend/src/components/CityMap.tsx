@@ -3,12 +3,15 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { EmotionSignal, EMOTION_CONFIG } from "@/types/emotion";
 import { MapPin } from "lucide-react";
+// IMPORT THE NEW CONFIG
+import { MUNICH_CENTER, MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
 
 interface CityMapProps {
   signals: EmotionSignal[];
   onLocationSelect?: (lat: number, lng: number) => void;
   selectMode?: boolean;
-  maxBounds?: maplibregl.LngLatBoundsLike; // Add maxBounds prop
+  maxBounds?: maplibregl.LngLatBoundsLike;
+  minZoom?: number; // Add minZoom prop
 }
 
 // Color map for emotions (matching our design system)
@@ -22,19 +25,28 @@ const EMOTION_COLORS: Record<string, string> = {
   tired: "#9370db",
 };
 
-export const CityMap = ({ signals, onLocationSelect, selectMode = false, maxBounds }: CityMapProps) => {
+export const CityMap = ({
+  signals,
+  onLocationSelect,
+  selectMode = false,
+  maxBounds = MUNICH_BOUNDS,
+  minZoom = MAP_DEFAULTS.minZoom // Use minZoom prop with default from config
+}: CityMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
+    // Prevent double initialization (React 18 Strict Mode fix)
+    if (map.current) return;
 
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://tiles.stadiamaps.com/styles/osm_bright.json", // Using an open-source style compatible with MapLibre
-      center: [11.5820, 48.1351], // Munich
-      zoom: 12,
-      maxBounds: maxBounds, // Apply maxBounds here
+      style: "https://tiles.stadiamaps.com/styles/osm_bright.json", 
+      center: MUNICH_CENTER, 
+      zoom: MAP_DEFAULTS.initialZoom,
+      maxBounds: maxBounds, 
+      minZoom: minZoom // Apply minZoom here
     });
 
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -77,7 +89,7 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false, maxBoun
         // Create popup
         const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
           <div style="padding: 8px; font-family: system-ui;">
-            <div style="font-weight: 600; text-align: center; margin-bottom: 4px; color: ${color};">${EMOTION_CONFIG[signal.emotion].label}</div>
+            <div style="font-weight: 600; text-align: center; margin-bottom: 4px; color: ${color};">${EMOTION_CONFIG[signal.emotion]?.label || signal.emotion}</div>
             ${signal.description ? `<div style="font-size: 12px; color: #666; margin-bottom: 4px;">${signal.description}</div>` : ""}
             <div style="font-size: 11px; color: #999; text-align: center;">${signal.timestamp.toLocaleTimeString()}</div>
           </div>
@@ -92,14 +104,15 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false, maxBoun
 
     return () => {
       map.current?.remove();
+      map.current = null;
     };
-  }, [signals, selectMode, onLocationSelect]);
+  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom]);
 
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" />
       {selectMode && (
-        <div className="absolute top-4 left-4 bg-card p-3 rounded-lg shadow-md border">
+        <div className="absolute top-4 left-4 bg-card p-3 rounded-lg shadow-md border z-10">
           <p className="text-sm font-medium flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             Click on the map to set location
