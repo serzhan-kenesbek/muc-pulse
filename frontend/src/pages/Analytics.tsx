@@ -23,7 +23,7 @@ const Analytics = () => {
   const [signals] = useState<EmotionSignal[]>(() => generateMockSignals(50));
   const [selectedTime, setSelectedTime] = useState<TimeOfDay>("all");
   const [showStats, setShowStats] = useState(false);
-  const [activeEmotionCategories, setActiveEmotionCategories] = useState<string | undefined>(undefined); // Changed type from string[] to string | undefined
+  const [activeEmotionCategories, setActiveEmotionCategories] = useState<string | undefined>("safe-unsafe"); // Set default to 'safe-unsafe'
 
   const filteredSignals = useMemo(() => {
     let currentSignals = signals;
@@ -75,14 +75,14 @@ const Analytics = () => {
             type="single" 
             value={activeEmotionCategories} 
             onValueChange={(value) => setActiveEmotionCategories(value || undefined)} 
-            className="flex flex-nowrap overflow-x-auto pb-2 gap-2"
+            className="flex flex-nowrap overflow-x-auto pb-2 gap-2 justify-start" // Added justify-start
           >
             {EMOTION_CATEGORIES.map(category => (
               <ToggleGroupItem 
                 key={category.value} 
                 value={category.value} 
                 aria-label={category.label}
-                className="flex items-center gap-2 whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 rounded-md"
+                className="flex items-center gap-2 whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 rounded-md flex-shrink-0"
               >
                 {category.label}
               </ToggleGroupItem>

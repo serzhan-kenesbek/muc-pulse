@@ -29,12 +29,14 @@ const Home = () => {
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Introduction */}
           <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold flex items-center justify-center gap-3">
-              Welcome to{" "}
-              <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 md:h-12 w-auto" />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                MUCPulse
-              </span>
+            <h2 className="text-4xl md:text-5xl font-bold flex flex-col items-center justify-center space-y-2 md:flex-row md:space-x-3 md:space-y-0 text-center">
+              <span>Welcome to</span>
+              <div className="flex flex-col items-center gap-1 md:flex-row md:gap-3">
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  MUCPulse
+                </span>
+                <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 md:h-12 w-auto" />
+              </div>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               A citizen-driven platform for sharing and visualizing city signals across Munich.
