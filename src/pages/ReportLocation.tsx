@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CityMap } from "@/components/CityMap";
 import { Heart, MapPin, Navigation } from "lucide-react";
 import { toast } from "sonner";
+
+// FIX 1: Move constants OUTSIDE the component so they don't recreate on every render
+const MUNICH_BOUNDS: [[number, number], [number, number]] = [
+  [11.3600, 48.0616], 
+  [11.7229, 48.2480]
+];
 
 const ReportLocation = () => {
   const navigate = useNavigate();
@@ -22,16 +28,19 @@ const ReportLocation = () => {
             lng: position.coords.longitude,
           };
           setUserLocation(location);
-          setSelectedLocation(location);
+          // Only auto-select if user hasn't manually picked something yet
+          if (!selectedLocation) {
+             setSelectedLocation(location);
+          }
           toast.success("Location detected");
         },
         (error) => {
           console.error(error);
-          toast.info("You can set a pin manually on the map");
+          // Don't show toast on error to avoid spamming if permission is just pending
         }
       );
     }
-  }, [userLocation]);
+  }, [userLocation, selectedLocation]);
 
   const handleUseMyLocation = () => {
     if (userLocation) {
@@ -39,7 +48,16 @@ const ReportLocation = () => {
       setLocationMethod("auto");
       toast.success("Using your current location");
     } else {
-      toast.error("Please enable location access");
+      // Retry getting location if it failed initially
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+           const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
+           setUserLocation(loc);
+           setSelectedLocation(loc);
+           setLocationMethod("auto");
+        }, 
+        () => toast.error("Please enable location access")
+      );
     }
   };
 
@@ -48,19 +66,19 @@ const ReportLocation = () => {
     toast.info("Click on the map to set your location");
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
+  // FIX 2: Memoize this function so the Map doesn't think it changed
+  const handleMapClick = useCallback((lat: number, lng: number) => {
     if (locationMethod === "manual") {
       setSelectedLocation({ lat, lng });
       toast.success("Location set on map");
     }
-  };
+  }, [locationMethod]);
 
   const handleNext = () => {
     if (!selectedLocation) {
       toast.error("Please select a location first");
       return;
     }
-    // Store location in sessionStorage to use in next step
     sessionStorage.setItem("reportLocation", JSON.stringify(selectedLocation));
     navigate("/report/submit");
   };
@@ -115,19 +133,19 @@ const ReportLocation = () => {
           </div>
         </Card>
 
-        {/* Map */}
-        <div className="flex-1 w-full min-h-[400px] rounded-lg overflow-hidden border mb-4">
+        {/* Map - FIX 3: Added h-[400px] instead of min-h to force explicit height */}
+        <div className="w-full h-[400px] rounded-lg overflow-hidden border mb-4 relative bg-muted/20">
           <CityMap
             signals={[]}
             onLocationSelect={handleMapClick}
             selectMode={locationMethod === "manual"}
-            maxBounds={[[11.3600, 48.0616], [11.7229, 48.2480]]} // Munich city bounds
+            maxBounds={MUNICH_BOUNDS} // Passing the constant, not a new array
           />
         </div>
 
         {/* Selected Location Info */}
         {selectedLocation && (
-          <Card className="p-4 mb-4 bg-primary/5">
+          <Card className="p-4 mb-4 bg-primary/5 animate-in fade-in slide-in-from-bottom-2">
             <div className="flex items-center gap-2 text-sm">
               <MapPin className="h-4 w-4 text-primary" />
               <span className="font-medium">Location Selected:</span>

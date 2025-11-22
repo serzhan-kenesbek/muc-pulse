@@ -8,6 +8,12 @@ import { EmotionSignal, TimeOfDay } from "@/types/emotion";
 import { Heart, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import { generateMockSignals } from "@/data/mockSignals";
 
+// 1. Define the Munich Boundaries (Same as ReportLocation)
+const MUNICH_BOUNDS: [[number, number], [number, number]] = [
+  [11.3600, 48.0616], 
+  [11.7229, 48.2480]
+];
+
 const Analytics = () => {
   const [signals] = useState<EmotionSignal[]>(() => generateMockSignals(50));
   const [selectedTime, setSelectedTime] = useState<TimeOfDay>("all");
@@ -56,7 +62,11 @@ const Analytics = () => {
             </h2>
           </div>
           <div className="h-[400px] md:h-[600px] rounded-lg overflow-hidden border">
-            <CityMap signals={filteredSignals} />
+            {/* 2. Pass the bounds here to lock it to Munich */}
+            <CityMap 
+              signals={filteredSignals} 
+              maxBounds={MUNICH_BOUNDS} 
+            />
           </div>
         </div>
 
