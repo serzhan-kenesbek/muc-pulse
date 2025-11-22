@@ -7,13 +7,7 @@
 
 ---
 
-## ❤️ MUCPulse: The Heartbeat of Munich
-
-### *Making the invisible visible — one emotion at a time.*
-
----
-
-## Hero Introduction
+## Inspiration
 
 Cities are more than concrete, transit lines, and coordinates. They are living organisms shaped by the emotions of the people who move through them every day — feelings of safety, stress, joy, isolation, comfort, and belonging.
 
@@ -52,19 +46,17 @@ Through an intuitive mobile-first interface and a dynamic heatmap, MUCPulse capt
 * Live, collective visualization of mood shifts across time
 * Designed for scalability from community tool to city-wide intelligence system
 
-This is not just feedback — it is a living emotional infrastructure.
-
 ---
 
 ## Key Features
 
-* 📍 **Real-Time Emotion Reporting** – Drop a pin and tag your current feeling
-* 🗺️ **Live Emotional Heatmap** – Visualize the collective mood of Munich
-* 🌓 **Time-Based Mood Filters** – See changes by Morning, Afternoon, Night
-* 🎯 **Category Filters** – Safety, Cleanliness, Vibes, Accessibility
-* 🔒 **Privacy-Conscious Design** – No personal data stored beyond anonymized signals
-* ⚡ **Instant Signal Reflection** – Updates appear in milliseconds across devices
-* 🧭 **Munich-Focused Bounds** – The experience intelligently locks to the Greater Munich area
+* **Real-Time Emotion Reporting** – Drop a pin and tag your current feeling
+* **Live Emotional Heatmap** – Visualize the collective mood of Munich
+* **Time-Based Mood Filters** – See changes by Morning, Afternoon, Night
+* **Category Filters** – Safety, Cleanliness, Accessibility, Sound, Crowd, Vibrancy
+* **Privacy-Conscious Design** – No personal data stored beyond anonymized signals
+* **Live Signal Reflection** – Updates appear each time you reload the page
+* **Munich-Focused Bounds** – The experience intelligently locks to the Greater Munich area
 
 ---
 
@@ -87,11 +79,11 @@ In seconds, one emotion becomes part of Munich’s collective emotional story.
 ### Frontend
 
 * **React + Vite** – Lightning-fast rendering and hot reload for rapid iteration
-* **Tailwind CSS + Shadcn UI** – Polished, responsive, and accessible design system
+* **Tailwind CSS** – Polished, responsive, and accessible design system
 
 ### Mapping & Visualization
 
-* **MapLibre GL + CartoDB** – Fully open-source mapping stack replacing paid providers
+* **MapLibre GL** – Fully open-source mapping stack replacing paid providers
 * **Custom Heatmap Rendering** – Efficient real-time visual aggregation
 
 ### Backend
@@ -100,7 +92,7 @@ In seconds, one emotion becomes part of Munich’s collective emotional story.
 
 ### Database
 
-* **PostgreSQL via Supabase** – Robust storage for geospatial and temporal data
+* **PostgreSQL** – Robust storage for geospatial and temporal data
 
 ### Geospatial Control
 
@@ -119,7 +111,7 @@ Geolocation Capture
         ↓
 FastAPI REST Endpoints
         ↓
-PostgreSQL (Supabase)
+PostgreSQL
         ↓
 Heatmap Data Aggregation
         ↓
@@ -168,10 +160,10 @@ Bridging snake_case backend models with camelCase frontend required building a t
 
 ### Long-Term
 
-* 🧠 AI emotion prediction
-* 🎥 Time-lapse city mood playback
-* 🏛 City council dashboards for policy insights
-* 🌍 Expansion to other cities
+* Data Interpretation AI Assistants 
+* Advanced dashboards that translate emotional data into actionable insights for city planners and policymakers.
+* Precision Urban Focus - more specialised use-cases (e.g. safety corridors, mental well-being zones, nightlife analytics) with deeper, high-resolution datasets
+* Scalable City Replication
 
 MUCPulse envisions a world where cities listen, adapt, and evolve based on human truth — not just hard data.
 
@@ -197,36 +189,13 @@ npm run dev
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### Environment Variables
-
-Create `.env` file:
-
-```
-SUPABASE_URL=your-url
-SUPABASE_KEY=your-key
-```
-
----
-
-## Demo & Screenshots
-
-### 🎥 Live Demo
-
-> [Link to deployed application]
 
 ### 📸 Screenshots
 
-* Home Screen – Emotion selection
-* Heatmap View – Collective mood visualization
-* Submission Flow – Signal reporting UI
-
-*(Add images here for visual storytelling)*
+* Will add Sunday morning!
 
 ---
 
@@ -236,14 +205,15 @@ Built with passion at **HackaTUM 2025**
 
 ### Core Team
 
-* [Your Name]
-* [Contributor Name]
-* [Contributor Name]
+* Serzhan Kenesbek
+* Kim Ngan Nguyen
+* Lena Elisabeth Holtmannspötter
 
 Special thanks to:
 
 * HackaTUM organizers
-* Open-source community
+* Lovable AI
+* Cursor AI
 * The people of Munich
 
 ---
@@ -255,5 +225,3 @@ MUCPulse is not just a hackathon project — it is the foundation of emotional u
 A system where voices become visibility.
 Where experience becomes data.
 Where cities learn how to feel.
-
-**MUCPulse — Feel your city. Understand your community. Shape the future.**
