@@ -2,8 +2,8 @@
 
 ## The Emotional Infrastructure of Munich
 
-> **A living map of how Munich *feels* — in real time.**
-> Transforming collective emotion into actionable urban intelligence.
+A living map of how Munich *feels* — in real time.
+Transforming collective emotion into actionable urban intelligence.
 
 ---
 
