@@ -50,41 +50,37 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false }: CityM
     }
 
     map.current.on("load", () => {
-      // Add emotion markers
+      // Add emotion markers with heatmap-style appearance
       signals.forEach((signal) => {
         const color = EMOTION_COLORS[signal.emotion] || "#999";
-        const emoji = EMOTION_CONFIG[signal.emotion].emoji;
 
         // Create custom marker element
         const el = document.createElement("div");
         el.className = "emotion-marker";
         el.style.cssText = `
           background-color: ${color};
-          width: 32px;
-          height: 32px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
           border: 2px solid white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 18px;
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-          transition: transform 0.2s;
+          box-shadow: 0 0 20px ${color}80, 0 2px 8px rgba(0,0,0,0.2);
+          transition: all 0.2s;
+          opacity: 0.8;
         `;
-        el.textContent = emoji;
         el.addEventListener("mouseenter", () => {
-          el.style.transform = "scale(1.2)";
+          el.style.transform = "scale(1.3)";
+          el.style.opacity = "1";
         });
         el.addEventListener("mouseleave", () => {
           el.style.transform = "scale(1)";
+          el.style.opacity = "0.8";
         });
 
         // Create popup
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
           <div style="padding: 8px; font-family: system-ui;">
-            <div style="font-size: 24px; text-align: center; margin-bottom: 4px;">${emoji}</div>
-            <div style="font-weight: 600; text-align: center; margin-bottom: 4px;">${EMOTION_CONFIG[signal.emotion].label}</div>
+            <div style="font-weight: 600; text-align: center; margin-bottom: 4px; color: ${color};">${EMOTION_CONFIG[signal.emotion].label}</div>
             ${signal.description ? `<div style="font-size: 12px; color: #666; margin-bottom: 4px;">${signal.description}</div>` : ""}
             <div style="font-size: 11px; color: #999; text-align: center;">${signal.timestamp.toLocaleTimeString()}</div>
           </div>

@@ -1,6 +1,7 @@
 import { EMOTION_CONFIG, EmotionType } from "@/types/emotion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import * as Icons from "lucide-react";
 
 interface EmotionSelectorProps {
   selectedEmotion: EmotionType | null;
@@ -9,10 +10,11 @@ interface EmotionSelectorProps {
 
 export const EmotionSelector = ({ selectedEmotion, onSelectEmotion }: EmotionSelectorProps) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 gap-4">
       {(Object.keys(EMOTION_CONFIG) as EmotionType[]).map((emotion) => {
         const config = EMOTION_CONFIG[emotion];
         const isSelected = selectedEmotion === emotion;
+        const IconComponent = Icons[config.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
         
         return (
           <Button
@@ -20,12 +22,12 @@ export const EmotionSelector = ({ selectedEmotion, onSelectEmotion }: EmotionSel
             variant="outline"
             onClick={() => onSelectEmotion(emotion)}
             className={cn(
-              "h-20 flex flex-col gap-1 transition-all border-2",
-              isSelected && `border-${config.color} bg-${config.color}/10 scale-105`
+              "h-24 flex flex-col gap-2 transition-all border-2",
+              isSelected ? "border-primary bg-primary/10 scale-105" : "border-border"
             )}
           >
-            <span className="text-3xl">{config.emoji}</span>
-            <span className="text-xs font-medium">{config.label}</span>
+            <IconComponent className="h-8 w-8" />
+            <span className="text-sm font-medium">{config.label}</span>
           </Button>
         );
       })}
