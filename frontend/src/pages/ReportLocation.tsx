@@ -14,8 +14,8 @@ const ReportLocation = () => {
   const [locationMethod, setLocationMethod] = useState<"auto" | "manual" | null>(null);
 
   useEffect(() => {
-    // Auto-prompt for location
-    if ("geolocation" in navigator && !userLocation) {
+    // Auto-prompt for location only if no method has been chosen yet (initial load) or explicitly 'auto'
+    if ("geolocation" in navigator && !userLocation && (locationMethod === null || locationMethod === "auto")) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
@@ -23,40 +23,36 @@ const ReportLocation = () => {
             lng: position.coords.longitude,
           };
           setUserLocation(location);
-          // Only auto-select if user hasn't manually picked something yet
-          if (!selectedLocation) {
+          // Always set selectedLocation if we successfully got userLocation and are in auto mode
+          if (locationMethod === "auto" || locationMethod === null) { // <--- MODIFIED THIS CONDITION
              setSelectedLocation(location);
+             setLocationMethod("auto"); // Explicitly set to auto if detected
           }
           toast.success("Location detected");
         },
         (error) => {
           console.error(error);
           // Don't show toast on error to avoid spamming if permission is just pending
+          // If locationMethod is null and failed, set it to manual as a fallback
+          if (locationMethod === null) {
+            setLocationMethod("manual");
+            toast.info("You can set a pin manually on the map");
+          }
         }
       );
     }
-  }, [userLocation, selectedLocation]);
+  }, [userLocation, selectedLocation, locationMethod]); // Added locationMethod to dependencies
 
   const handleUseMyLocation = () => {
-    if (userLocation) {
-      setSelectedLocation(userLocation);
-      setLocationMethod("auto");
-      toast.success("Using your current location");
-    } else {
-      // Retry getting location if it failed initially
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-           const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
-           setUserLocation(loc);
-           setSelectedLocation(loc);
-           setLocationMethod("auto");
-        }, 
-        () => toast.error("Please enable location access")
-      );
-    }
+    // Force re-prompt/re-detection if user clicks 'Use My Location' again
+    setUserLocation(null); 
+    setSelectedLocation(null); // Clear previous selection
+    setLocationMethod("auto");
+    // The useEffect will handle the actual geolocation call
   };
 
   const handleSetPin = () => {
+    setSelectedLocation(null); // Clear any auto-detected pin
     setLocationMethod("manual");
     toast.info("Click on the map to set your location");
   };
@@ -131,11 +127,19 @@ const ReportLocation = () => {
         {/* Map - FIX 3: Added h-[400px] instead of min-h to force explicit height */}
         <div className="w-full h-[400px] rounded-lg overflow-hidden border mb-4 relative bg-muted/20">
           <CityMap
-            signals={[]}
             onLocationSelect={handleMapClick}
             selectMode={locationMethod === "manual"}
             maxBounds={MUNICH_BOUNDS} // Use MUNICH_BOUNDS from config
             minZoom={MAP_DEFAULTS.minZoom}
+            center={selectedLocation ? [selectedLocation.lng, selectedLocation.lat] : undefined} // Center map on selected location
+            signals={selectedLocation ? [{ 
+              id: "user-location", 
+              emotion: "neutral", // Neutral emotion for user's own location
+              location: selectedLocation,
+              timestamp: new Date(),
+              description: "Your location",
+              timeOfDay: "all",
+            }] : []}
           />
         </div>
 

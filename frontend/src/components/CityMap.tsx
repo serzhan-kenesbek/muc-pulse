@@ -11,7 +11,8 @@ interface CityMapProps {
   onLocationSelect?: (lat: number, lng: number) => void;
   selectMode?: boolean;
   maxBounds?: maplibregl.LngLatBoundsLike;
-  minZoom?: number; // Add minZoom prop
+  minZoom?: number; 
+  center?: [number, number]; // Add center prop
 }
 
 // Color map for emotions (matching our design system)
@@ -30,7 +31,8 @@ export const CityMap = ({
   onLocationSelect,
   selectMode = false,
   maxBounds = MUNICH_BOUNDS,
-  minZoom = MAP_DEFAULTS.minZoom // Use minZoom prop with default from config
+  minZoom = MAP_DEFAULTS.minZoom,
+  center = MUNICH_CENTER // Use center prop with default from config
 }: CityMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -43,7 +45,7 @@ export const CityMap = ({
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: "https://tiles.stadiamaps.com/styles/osm_bright.json", 
-      center: MUNICH_CENTER, 
+      center: center, // Use the center prop here
       zoom: MAP_DEFAULTS.initialZoom,
       maxBounds: maxBounds, 
       minZoom: minZoom // Apply minZoom here
@@ -106,7 +108,7 @@ export const CityMap = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom]);
+  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom, center]); // Add center to dependencies
 
   return (
     <div className="relative w-full h-full">
