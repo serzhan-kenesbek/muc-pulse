@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart } from "lucide-react";
@@ -66,9 +66,11 @@ const ReportSubmit = () => {
           <div className="flex items-center gap-3">
             <Heart className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                MUCPulse
-              </h1>
+              <Link to="/">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  MUCPulse
+                </h1>
+              </Link>
               <p className="text-xs text-muted-foreground">Report a Signal</p>
             </div>
           </div>

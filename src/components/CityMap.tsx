@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useEffect, useRef } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { EmotionSignal, EMOTION_CONFIG } from "@/types/emotion";
-import { Input } from "@/components/ui/input";
 import { MapPin } from "lucide-react";
 
 interface CityMapProps {
   signals: EmotionSignal[];
   onLocationSelect?: (lat: number, lng: number) => void;
   selectMode?: boolean;
+  maxBounds?: maplibregl.LngLatBoundsLike; // Add maxBounds prop
 }
 
 // Color map for emotions (matching our design system)
@@ -22,25 +22,22 @@ const EMOTION_COLORS: Record<string, string> = {
   tired: "#9370db",
 };
 
-export const CityMap = ({ signals, onLocationSelect, selectMode = false }: CityMapProps) => {
+export const CityMap = ({ signals, onLocationSelect, selectMode = false, maxBounds }: CityMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState("");
-  const [tokenSubmitted, setTokenSubmitted] = useState(false);
+  const map = useRef<maplibregl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current || !tokenSubmitted || !mapboxToken) return;
+    if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = mapboxToken;
-
-    map.current = new mapboxgl.Map({
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "https://tiles.stadiamaps.com/styles/osm_bright.json", // Using an open-source style compatible with MapLibre
       center: [11.5820, 48.1351], // Munich
       zoom: 12,
+      maxBounds: maxBounds, // Apply maxBounds here
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
     // Add click handler for location selection
     if (selectMode && onLocationSelect) {
@@ -78,7 +75,7 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false }: CityM
         });
 
         // Create popup
-        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
           <div style="padding: 8px; font-family: system-ui;">
             <div style="font-weight: 600; text-align: center; margin-bottom: 4px; color: ${color};">${EMOTION_CONFIG[signal.emotion].label}</div>
             ${signal.description ? `<div style="font-size: 12px; color: #666; margin-bottom: 4px;">${signal.description}</div>` : ""}
@@ -86,7 +83,7 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false }: CityM
           </div>
         `);
 
-        new mapboxgl.Marker(el)
+        new maplibregl.Marker(el)
           .setLngLat([signal.location.lng, signal.location.lat])
           .setPopup(popup)
           .addTo(map.current!);
@@ -96,47 +93,7 @@ export const CityMap = ({ signals, onLocationSelect, selectMode = false }: CityM
     return () => {
       map.current?.remove();
     };
-  }, [signals, tokenSubmitted, mapboxToken, selectMode, onLocationSelect]);
-
-  if (!tokenSubmitted) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-muted rounded-lg p-8">
-        <div className="max-w-md w-full space-y-4">
-          <div className="text-center space-y-2">
-            <MapPin className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-lg font-semibold">Enter Mapbox Token</h3>
-            <p className="text-sm text-muted-foreground">
-              Get your free token at{" "}
-              <a
-                href="https://mapbox.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                mapbox.com
-              </a>
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="pk.eyJ1Ijoi..."
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-              className="flex-1"
-            />
-            <button
-              onClick={() => setTokenSubmitted(true)}
-              disabled={!mapboxToken}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Load Map
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [signals, selectMode, onLocationSelect]);
 
   return (
     <div className="relative w-full h-full">

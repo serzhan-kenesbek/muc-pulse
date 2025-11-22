@@ -19,12 +19,7 @@ const Home = () => {
                 <p className="text-xs text-muted-foreground">City Signals Project</p>
               </div>
             </div>
-            <Link to="/analytics">
-              <Button variant="outline" className="gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Heatmap / Analytics
-              </Button>
-            </Link>
+            {/* Removed the Analytics button from the navbar */}
           </div>
         </div>
       </header>
@@ -81,18 +76,18 @@ const Home = () => {
                 Scan a QR code or start reporting directly
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/report/location">
-                <Button size="lg" className="gap-2 w-full sm:w-auto">
-                  <MapPin className="h-5 w-5" />
-                  Submit a Signal
-                </Button>
+            <div className="grid md:grid-cols-2 gap-6 justify-center">
+              <Link to="/report/location" className="h-full">
+                <Card className="p-6 space-y-3 h-full flex flex-col items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer">
+                  <MapPin className="h-10 w-10 text-white" />
+                  <span className="text-lg font-semibold">Submit a Signal</span>
+                </Card>
               </Link>
-              <Link to="/analytics">
-                <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-                  <BarChart3 className="h-5 w-5" />
-                  View Heatmap
-                </Button>
+              <Link to="/analytics" className="h-full">
+                <Card className="p-6 space-y-3 h-full flex flex-col items-center justify-center border bg-card shadow-sm hover:bg-muted hover:text-foreground transition-colors cursor-pointer">
+                  <BarChart3 className="h-10 w-10 text-primary" />
+                  <span className="text-lg font-semibold">Heatmap / Analytics</span>
+                </Card>
               </Link>
             </div>
           </div>

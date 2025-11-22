@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CityMap } from "@/components/CityMap";
@@ -73,9 +73,11 @@ const ReportLocation = () => {
           <div className="flex items-center gap-3">
             <Heart className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                MUCPulse
-              </h1>
+              <Link to="/">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  MUCPulse
+                </h1>
+              </Link>
               <p className="text-xs text-muted-foreground">Report a Signal</p>
             </div>
           </div>
@@ -114,11 +116,12 @@ const ReportLocation = () => {
         </Card>
 
         {/* Map */}
-        <div className="flex-1 min-h-[400px] rounded-lg overflow-hidden border mb-4">
+        <div className="flex-1 w-full min-h-[400px] rounded-lg overflow-hidden border mb-4">
           <CityMap
             signals={[]}
             onLocationSelect={handleMapClick}
             selectMode={locationMethod === "manual"}
+            maxBounds={[[11.3600, 48.0616], [11.7229, 48.2480]]} // Munich city bounds
           />
         </div>
 
