@@ -1,126 +1,243 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { EmotionSignal, EMOTION_CONFIG } from "@/types/emotion";
+import { EmotionSignal } from "@/types/emotion";
 import { MapPin } from "lucide-react";
-// IMPORT THE NEW CONFIG
 import { MUNICH_CENTER, MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
 
 interface CityMapProps {
-  signals: EmotionSignal[];
-  onLocationSelect?: (lat: number, lng: number) => void;
-  selectMode?: boolean;
-  maxBounds?: maplibregl.LngLatBoundsLike;
-  minZoom?: number; 
-  center?: [number, number]; // Add center prop
+    signals: EmotionSignal[];
+    onLocationSelect?: (lat: number, lng: number) => void;
+    selectMode?: boolean;
+    maxBounds?: maplibregl.LngLatBoundsLike;
+    minZoom?: number;
+    center?: [number, number];
 }
 
-// Color map for emotions (matching our design system)
-const EMOTION_COLORS: Record<string, string> = {
-  happy: "#f4c430",
-  neutral: "#b3b3b3",
-  sad: "#5b8cdb",
-  stressed: "#e85d4a",
-  calm: "#4db6a3",
-  energetic: "#f5a142",
-  tired: "#9370db",
-};
+// welche Emotionen zählen als „good“ / „bad“
+const GOOD_EMOTIONS = new Set<string>([
+    "safe",
+    "clean",
+    "accessible",
+    "quiet",
+    "uncrowded",
+    "lively",
+]);
+
+const BAD_EMOTIONS = new Set<string>([
+    "unsafe",
+    "dirty",
+    "inaccessible",
+    "noisy",
+    "crowded",
+    "boring",
+]);
 
 export const CityMap = ({
-  signals,
-  onLocationSelect,
-  selectMode = false,
-  maxBounds = MUNICH_BOUNDS,
-  minZoom = MAP_DEFAULTS.minZoom,
-  center = MUNICH_CENTER // Use center prop with default from config
-}: CityMapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<maplibregl.Map | null>(null);
+                            signals,
+                            onLocationSelect,
+                            selectMode = false,
+                            maxBounds = MUNICH_BOUNDS,
+                            minZoom = MAP_DEFAULTS.minZoom,
+                            center = MUNICH_CENTER,
+                        }: CityMapProps) => {
+    const mapContainer = useRef<HTMLDivElement | null>(null);
+    const map = useRef<maplibregl.Map | null>(null);
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
-    // Prevent double initialization (React 18 Strict Mode fix)
-    if (map.current) return;
+    // getrennte GeoJSONs für good / bad
+    const { goodGeojson, badGeojson } = useMemo(() => {
+        const goodFeatures: any[] = [];
+        const badFeatures: any[] = [];
 
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: "https://tiles.stadiamaps.com/styles/osm_bright.json", 
-      center: center, // Use the center prop here
-      zoom: MAP_DEFAULTS.initialZoom,
-      maxBounds: maxBounds, 
-      minZoom: minZoom // Apply minZoom here
-    });
+        for (const s of signals) {
+            const coords: [number, number] = [s.location.lng, s.location.lat];
 
-    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+            if (BAD_EMOTIONS.has(s.emotion)) {
+                badFeatures.push({
+                    type: "Feature",
+                    properties: { weight: 1.0 },
+                    geometry: { type: "Point", coordinates: coords },
+                });
+            } else if (GOOD_EMOTIONS.has(s.emotion)) {
+                goodFeatures.push({
+                    type: "Feature",
+                    properties: { weight: 0.7 },
+                    geometry: { type: "Point", coordinates: coords },
+                });
+            } else {
+                // neutral / unknown -> leicht positiv
+                goodFeatures.push({
+                    type: "Feature",
+                    properties: { weight: 0.4 },
+                    geometry: { type: "Point", coordinates: coords },
+                });
+            }
+        }
 
-    // Add click handler for location selection
-    if (selectMode && onLocationSelect) {
-      map.current.on("click", (e) => {
-        onLocationSelect(e.lngLat.lat, e.lngLat.lng);
-      });
-    }
+        return {
+            goodGeojson: {
+                type: "FeatureCollection" as const,
+                features: goodFeatures,
+            },
+            badGeojson: {
+                type: "FeatureCollection" as const,
+                features: badFeatures,
+            },
+        };
+    }, [signals]);
 
-    map.current.on("load", () => {
-      // Add emotion markers with heatmap-style appearance
-      signals.forEach((signal) => {
-        const color = EMOTION_COLORS[signal.emotion] || "#999";
+    // 🔹 Map EINMAL initialisieren – NICHT von signals abhängig
+    useEffect(() => {
+        if (!mapContainer.current || map.current) return;
 
-        // Create custom marker element
-        const el = document.createElement("div");
-        el.className = "emotion-marker";
-        el.style.cssText = `
-          background-color: ${color};
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          border: 2px solid white;
-          cursor: pointer;
-          box-shadow: 0 0 20px ${color}80, 0 2px 8px rgba(0,0,0,0.2);
-          transition: all 0.2s;
-          opacity: 0.8;
-        `;
-        el.addEventListener("mouseenter", () => {
-          el.style.transform = "scale(1.3)";
-          el.style.opacity = "1";
+        const m = new maplibregl.Map({
+            container: mapContainer.current,
+            style: "https://tiles.stadiamaps.com/styles/osm_bright.json",
+            center,
+            zoom: MAP_DEFAULTS.initialZoom,
+            maxBounds,
+            minZoom,
         });
-        el.addEventListener("mouseleave", () => {
-          el.style.transform = "scale(1)";
-          el.style.opacity = "0.8";
+
+        map.current = m;
+        m.addControl(new maplibregl.NavigationControl(), "top-right");
+
+        m.on("load", () => {
+            // BAD-Heatmap (pink/orange/rot)
+            m.addSource("signals-bad", {
+                type: "geojson",
+                data: badGeojson,
+            });
+
+            m.addLayer({
+                id: "heatmap-bad",
+                type: "heatmap",
+                source: "signals-bad",
+                maxzoom: 18,
+                paint: {
+                    "heatmap-weight": ["get", "weight"],
+                    "heatmap-intensity": 1.4,
+                    "heatmap-radius": 40,
+                    "heatmap-opacity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        10,
+                        0.6,
+                        15,
+                        0.95,
+                    ],
+                    "heatmap-color": [
+                        "interpolate",
+                        ["linear"],
+                        ["heatmap-density"],
+                        0.0,
+                        "rgba(0,0,0,0)",
+                        0.2,
+                        "#f9a8d4", // pink-300
+                        0.5,
+                        "#fb923c", // orange-400
+                        0.8,
+                        "#f97373", // soft red
+                        1.0,
+                        "#ef4444", // red-500
+                    ],
+                },
+            });
+
+            // GOOD-Heatmap (grün / cyan)
+            m.addSource("signals-good", {
+                type: "geojson",
+                data: goodGeojson,
+            });
+
+            m.addLayer({
+                id: "heatmap-good",
+                type: "heatmap",
+                source: "signals-good",
+                maxzoom: 18,
+                paint: {
+                    "heatmap-weight": ["get", "weight"],
+                    "heatmap-intensity": 1.2,
+                    "heatmap-radius": 40,
+                    "heatmap-opacity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        10,
+                        0.5,
+                        15,
+                        0.9,
+                    ],
+                    "heatmap-color": [
+                        "interpolate",
+                        ["linear"],
+                        ["heatmap-density"],
+                        0.0,
+                        "rgba(0,0,0,0)",
+                        0.2,
+                        "#6ee7b7", // emerald-300
+                        0.5,
+                        "#22c55e", // green-500
+                        0.8,
+                        "#22d3ee", // cyan-400
+                        1.0,
+                        "#2dd4bf", // teal-400
+                    ],
+                },
+            });
         });
 
-        // Create popup
-        const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
-          <div style="padding: 8px; font-family: system-ui;">
-            <div style="font-weight: 600; text-align: center; margin-bottom: 4px; color: ${color};">${EMOTION_CONFIG[signal.emotion]?.label || signal.emotion}</div>
-            ${signal.description ? `<div style="font-size: 12px; color: #666; margin-bottom: 4px;">${signal.description}</div>` : ""}
-            <div style="font-size: 11px; color: #999; text-align: center;">${signal.timestamp.toLocaleTimeString()}</div>
-          </div>
-        `);
+        return () => {
+            m.remove();
+            map.current = null;
+        };
+    }, [center, maxBounds, minZoom, goodGeojson, badGeojson]);
 
-        new maplibregl.Marker(el)
-          .setLngLat([signal.location.lng, signal.location.lat])
-          .setPopup(popup)
-          .addTo(map.current!);
-      });
-    });
+    // 🔹 Daten nachladen wenn sich signals/Filter ändern
+    useEffect(() => {
+        if (!map.current) return;
 
-    return () => {
-      map.current?.remove();
-      map.current = null;
-    };
-  }, [signals, selectMode, onLocationSelect, maxBounds, minZoom, center]);
+        const badSource = map.current.getSource("signals-bad") as
+            | maplibregl.GeoJSONSource
+            | undefined;
+        const goodSource = map.current.getSource("signals-good") as
+            | maplibregl.GeoJSONSource
+            | undefined;
 
-  return (
-    <div className="relative w-full h-full">
-      <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" />
-      {selectMode && (
-        <div className="absolute top-4 left-4 bg-card p-3 rounded-lg shadow-md border z-10">
-          <p className="text-sm font-medium flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            Click on the map to set location
-          </p>
+        if (badSource) badSource.setData(badGeojson);
+        if (goodSource) goodSource.setData(goodGeojson);
+    }, [badGeojson, goodGeojson]);
+
+    // 🔹 Click-to-select (für /report/location) – zeigt nichts auf der Karte, ruft nur Callback
+    useEffect(() => {
+        if (!map.current || !onLocationSelect) return;
+
+        const handleClick = (e: maplibregl.MapMouseEvent) => {
+            if (!selectMode) return;
+            onLocationSelect(e.lngLat.lat, e.lngLat.lng);
+        };
+
+        map.current.on("click", handleClick);
+        return () => {
+            map.current?.off("click", handleClick);
+        };
+    }, [selectMode, onLocationSelect]);
+
+    return (
+        <div className="relative w-full h-full">
+            <div
+                ref={mapContainer}
+                className="absolute inset-0 rounded-lg shadow-lg"
+            />
+            {selectMode && (
+                <div className="absolute top-4 left-4 bg-card p-3 rounded-lg shadow-md border z-10">
+                    <p className="text-sm font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Click on the map to set location
+                    </p>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };

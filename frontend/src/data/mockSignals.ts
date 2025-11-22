@@ -13,8 +13,8 @@ function getTimeOfDay(hour: number): TimeOfDay {
   return "night";
 }
 
-export const generateMockSignals = (count: number = 50): EmotionSignal[] => {
-  const emotions = ["happy", "neutral", "sad", "stressed", "calm", "energetic", "tired"] as const;
+export const generateMockSignals = (count: number = 1000): EmotionSignal[] => {
+  const emotions = ["unsafe", "safe", "dirty", "clean", "calm", "quiet", "noisy"] as const;
   const signals: EmotionSignal[] = [];
 
   for (let i = 0; i < count; i++) {

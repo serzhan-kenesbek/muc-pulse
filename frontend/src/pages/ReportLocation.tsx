@@ -132,9 +132,9 @@ const ReportLocation = () => {
             maxBounds={MUNICH_BOUNDS} // Use MUNICH_BOUNDS from config
             minZoom={MAP_DEFAULTS.minZoom}
             center={selectedLocation ? [selectedLocation.lng, selectedLocation.lat] : undefined} // Center map on selected location
-            signals={selectedLocation ? [{ 
+            signals={selectedLocation ? [{
               id: "user-location", 
-              emotion: "neutral", // Neutral emotion for user's own location
+              emotion: "safe", // Neutral emotion for user's own location
               location: selectedLocation,
               timestamp: new Date(),
               description: "Your location",
