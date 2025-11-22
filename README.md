@@ -1,73 +1,259 @@
-# Welcome to your Lovable project
+# MUCPulse
 
-## Project info
+## The Emotional Infrastructure of Munich
 
-**URL**: https://lovable.dev/projects/08969855-c420-419c-86d8-12a8f8ad471c
+> **A living map of how Munich *feels* — in real time.**
+> Transforming collective emotion into actionable urban intelligence.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ❤️ MUCPulse: The Heartbeat of Munich
 
-**Use Lovable**
+### *Making the invisible visible — one emotion at a time.*
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/08969855-c420-419c-86d8-12a8f8ad471c) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Hero Introduction
 
-**Use your preferred IDE**
+Cities are more than concrete, transit lines, and coordinates. They are living organisms shaped by the emotions of the people who move through them every day — feelings of safety, stress, joy, isolation, comfort, and belonging.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Yet while we can map every street and station with precision, we have no system to capture how it actually *feels* to exist in those spaces.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**MUCPulse changes that.** It transforms the collective emotional experience of Munich into a real-time, interactive map — empowering citizens, informing decision-makers, and revealing the city’s true human rhythm for the first time.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## The Problem
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Urban planning is traditionally driven by structural data: traffic flow, construction density, zoning laws, and public infrastructure metrics. What’s missing is the emotional layer — how people truly experience these environments.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Questions citizens face daily have no concrete answers:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+* Is this park safe after sunset?
+* Why does this area feel stressful during rush hour?
+* Which streets actually feel welcoming and alive?
+
+Without emotional data, cities grow blind to the lived realities of their communities. This disconnect results in underused public spaces, unsafe zones, and overlooked issues that silently shape everyday life.
+
+Munich deserved a system that listens to its people — not just measures them.
+
+---
+
+## The Solution
+
+**MUCPulse** is a real-time emotional intelligence platform that allows citizens to share how they feel at specific locations, converting subjective experience into structured, visualized insight.
+
+Through an intuitive mobile-first interface and a dynamic heatmap, MUCPulse captures the emotional pulse of the city and presents it as actionable data for both citizens and urban planners.
+
+### What makes MUCPulse different:
+
+* Emotion-first mapping instead of location-only data
+* Fully open-source, privacy-respecting geospatial stack
+* Live, collective visualization of mood shifts across time
+* Designed for scalability from community tool to city-wide intelligence system
+
+This is not just feedback — it is a living emotional infrastructure.
+
+---
+
+## Key Features
+
+* 📍 **Real-Time Emotion Reporting** – Drop a pin and tag your current feeling
+* 🗺️ **Live Emotional Heatmap** – Visualize the collective mood of Munich
+* 🌓 **Time-Based Mood Filters** – See changes by Morning, Afternoon, Night
+* 🎯 **Category Filters** – Safety, Cleanliness, Vibes, Accessibility
+* 🔒 **Privacy-Conscious Design** – No personal data stored beyond anonymized signals
+* ⚡ **Instant Signal Reflection** – Updates appear in milliseconds across devices
+* 🧭 **Munich-Focused Bounds** – The experience intelligently locks to the Greater Munich area
+
+---
+
+## How It Works
+
+1. User opens MUCPulse on mobile or desktop
+2. Grants location permission (or selects position manually)
+3. Chooses an emotion that represents their current feeling
+4. Submits the signal
+5. A pin is dropped and instantly reflected on the heatmap
+6. Aggregated emotions dynamically shape the city’s visual mood layer
+7. Users explore trends by time or category
+
+In seconds, one emotion becomes part of Munich’s collective emotional story.
+
+---
+
+## Technology Stack
+
+### Frontend
+
+* **React + Vite** – Lightning-fast rendering and hot reload for rapid iteration
+* **Tailwind CSS + Shadcn UI** – Polished, responsive, and accessible design system
+
+### Mapping & Visualization
+
+* **MapLibre GL + CartoDB** – Fully open-source mapping stack replacing paid providers
+* **Custom Heatmap Rendering** – Efficient real-time visual aggregation
+
+### Backend
+
+* **FastAPI (Python)** – High-performance async server for signal handling
+
+### Database
+
+* **PostgreSQL via Supabase** – Robust storage for geospatial and temporal data
+
+### Geospatial Control
+
+* Custom boundary logic to lock interaction to Greater Munich area
+
+This stack ensures performance, sustainability, privacy, and scalability.
+
+---
+
+## System Architecture Overview
+
+```
+User Interface (React)
+        ↓
+Geolocation Capture
+        ↓
+FastAPI REST Endpoints
+        ↓
+PostgreSQL (Supabase)
+        ↓
+Heatmap Data Aggregation
+        ↓
+MapLibre Visualization Layer
+```
+
+* Frontend captures emotional input and location
+* Backend validates and stores anonymized signal
+* Database indexes spatial + temporal dimensions
+* Aggregation engine feeds live heatmap
+* MapLibre renders real-time emotional terrain
+
+A seamless bridge between emotion and infrastructure.
+
+---
+
+## Challenges & Learnings
+
+### Ghost Map Bug
+
+React 18 Strict Mode caused double rendering and collapsing map containers. We solved this with strict ref validation and container containment strategies.
+
+### Privacy vs Precision
+
+Browser geolocation restrictions required layered user guidance and fallback logic to preserve usability without sacrificing trust.
+
+### Data Serialization
+
+Bridging snake_case backend models with camelCase frontend required building a transformation adapter layer.
+
+### What This Taught Us
+
+* Frontend-based filtering dramatically improves UX performance
+* Shared type thinking prevents runtime failure
+* Emotional transparency earns user trust
+
+---
+
+## Impact & Future Vision
+
+### Short-Term
+
+* Crowd-sourced safety awareness
+* Community-driven urban feedback
+* Real-time civic engagement
+
+### Long-Term
+
+* 🧠 AI emotion prediction
+* 🎥 Time-lapse city mood playback
+* 🏛 City council dashboards for policy insights
+* 🌍 Expansion to other cities
+
+MUCPulse envisions a world where cities listen, adapt, and evolve based on human truth — not just hard data.
+
+---
+
+## Installation & Setup
+
+```bash
+# Clone repository
+git clone https://github.com/your-username/mucpulse.git
+cd mucpulse
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Backend
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
-**Use GitHub Codespaces**
+### Environment Variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Create `.env` file:
 
-## What technologies are used for this project?
+```
+SUPABASE_URL=your-url
+SUPABASE_KEY=your-key
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Demo & Screenshots
 
-## How can I deploy this project?
+### 🎥 Live Demo
 
-Simply open [Lovable](https://lovable.dev/projects/08969855-c420-419c-86d8-12a8f8ad471c) and click on Share -> Publish.
+> [Link to deployed application]
 
-## Can I connect a custom domain to my Lovable project?
+### 📸 Screenshots
 
-Yes, you can!
+* Home Screen – Emotion selection
+* Heatmap View – Collective mood visualization
+* Submission Flow – Signal reporting UI
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+*(Add images here for visual storytelling)*
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+
+## Contributors & Acknowledgements
+
+Built with passion at **HackaTUM 2025**
+
+### Core Team
+
+* [Your Name]
+* [Contributor Name]
+* [Contributor Name]
+
+Special thanks to:
+
+* HackaTUM organizers
+* Open-source community
+* The people of Munich
+
+---
+
+## Final Words
+
+MUCPulse is not just a hackathon project — it is the foundation of emotional urban intelligence.
+
+A system where voices become visibility.
+Where experience becomes data.
+Where cities learn how to feel.
+
+**MUCPulse — Feel your city. Understand your community. Shape the future.**
