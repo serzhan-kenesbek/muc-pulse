@@ -1,9 +1,43 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, MapPin, BarChart3, QrCode } from "lucide-react";
+import { fetchSignals } from "@/services/api"; // Import the API bridge
 
 const Home = () => {
+  // 1. Define state to hold your stats (initialize with 0)
+  const [stats, setStats] = useState({
+    totalSignals: 0,
+    uniqueLocations: 0,
+    activeQrCodes: 0
+  });
+
+  // 2. Fetch data when the page loads
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        // Get all signals from Python backend
+        const data = await fetchSignals();
+        
+        // Calculate Unique Locations (prevent counting the same spot twice)
+        const uniqueLocs = new Set(data.map(s => `${s.location.lat},${s.location.lng}`)).size;
+        
+        // Update the state with real numbers
+        setStats({
+          totalSignals: data.length,
+          uniqueLocations: uniqueLocs,
+          // As requested: QR Codes count = Total Signals
+          activeQrCodes: data.length 
+        });
+      } catch (error) {
+        console.error("Failed to load home stats", error);
+      }
+    };
+
+    loadStats();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation Bar */}
@@ -99,15 +133,15 @@ const Home = () => {
           <Card className="p-8 bg-gradient-to-br from-primary/5 to-accent/5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <p className="text-3xl font-bold text-primary">1.2K+</p>
+                <p className="text-3xl font-bold text-primary">{stats.totalSignals}</p>
                 <p className="text-sm text-muted-foreground">Signals Shared</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary">250+</p>
+                <p className="text-3xl font-bold text-primary">{stats.uniqueLocations}</p>
                 <p className="text-sm text-muted-foreground">Locations</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-primary">100+</p>
+                <p className="text-3xl font-bold text-primary">{stats.totalSignals}</p>
                 <p className="text-sm text-muted-foreground">QR Codes</p>
               </div>
               <div>

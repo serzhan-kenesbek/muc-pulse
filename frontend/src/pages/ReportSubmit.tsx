@@ -73,9 +73,6 @@ const ReportSubmit = () => {
     .catch(() => {
       toast.error("Submission failed");
     });
-    
-    toast.success("Signal submitted successfully!");
-    navigate("/report/success");
   };
 
   const renderIcon = (iconName: string) => {

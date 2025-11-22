@@ -4,7 +4,7 @@ from .database import Base
 
 
 class Request(Base):
-    __tablename__ = "requests"
+    __tablename__ = "reports"
 
     id = Column(Integer, primary_key=True, index=True)
     time = Column(TIMESTAMP, server_default=func.now())

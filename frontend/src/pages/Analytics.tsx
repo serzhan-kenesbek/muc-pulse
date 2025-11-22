@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,8 +15,10 @@ import {
     ChevronUp,
     BarChart3,
 } from "lucide-react";
-import { generateMockSignals } from "@/data/mockSignals";
+// REMOVED: generateMockSignals
+import { fetchSignals } from "@/services/api"; // ADDED: Real API
 import { MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
+import { TIME_RANGES } from "@/config/time"; 
 import {
     ToggleGroup,
     ToggleGroupItem,
@@ -31,8 +33,7 @@ const EMOTION_CATEGORIES = [
     { label: "Vibrancy", value: "lively-boring", emotions: ["lively", "boring"] as EmotionType[] },
 ];
 
-// Good / Bad definition
-const GOOD_EMOTIONS: EmotionType[] = [
+const POSITIVE_EMOTIONS: EmotionType[] = [
     "safe",
     "clean",
     "accessible",
@@ -41,7 +42,7 @@ const GOOD_EMOTIONS: EmotionType[] = [
     "lively",
 ];
 
-const BAD_EMOTIONS: EmotionType[] = [
+const NEGATIVE_EMOTIONS: EmotionType[] = [
     "unsafe",
     "dirty",
     "inaccessible",
@@ -51,13 +52,34 @@ const BAD_EMOTIONS: EmotionType[] = [
 ];
 
 const Analytics = () => {
-    const [signals] = useState<EmotionSignal[]>(() => generateMockSignals(1000));
+    // 1. Initialize with empty array instead of mock data
+    const [signals, setSignals] = useState<EmotionSignal[]>([]);
+    
     const [selectedTime, setSelectedTime] = useState<TimeOfDay>("all");
     const [showStats, setShowStats] = useState(false);
+    
     const [activeEmotionCategories, setActiveEmotionCategories] = useState<string | undefined>(
         "safe-unsafe"
     );
-    const [polarityFilter, setPolarityFilter] = useState<"all" | "good" | "bad">("all");
+    
+    const [polarityFilter, setPolarityFilter] = useState<"all" | "positive" | "negative">("all");
+
+    // 2. Fetch real data on mount
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const data = await fetchSignals();
+                setSignals(data);
+            } catch (error) {
+                console.error("Failed to load analytics data", error);
+            }
+        };
+
+        loadData();
+        // Optional: Poll for new data every 30 seconds
+        // const interval = setInterval(loadData, 30000);
+        // return () => clearInterval(interval);
+    }, []);
 
     const filteredSignals = useMemo(() => {
         let currentSignals = signals;
@@ -69,20 +91,20 @@ const Analytics = () => {
             );
         }
 
-        // Good / Bad filter
-        if (polarityFilter === "good") {
-            const goodSet = new Set<EmotionType>(GOOD_EMOTIONS);
+        // Positive / Negative filter
+        if (polarityFilter === "positive") {
+            const posSet = new Set<EmotionType>(POSITIVE_EMOTIONS);
             currentSignals = currentSignals.filter((signal) =>
-                goodSet.has(signal.emotion)
+                posSet.has(signal.emotion)
             );
-        } else if (polarityFilter === "bad") {
-            const badSet = new Set<EmotionType>(BAD_EMOTIONS);
+        } else if (polarityFilter === "negative") {
+            const negSet = new Set<EmotionType>(NEGATIVE_EMOTIONS);
             currentSignals = currentSignals.filter((signal) =>
-                badSet.has(signal.emotion)
+                negSet.has(signal.emotion)
             );
         }
 
-        // Category pair filter (safe/unsafe, clean/dirty, etc.)
+        // Category pair filter
         if (activeEmotionCategories) {
             const category = EMOTION_CATEGORIES.find(
                 (cat) => cat.value === activeEmotionCategories
@@ -99,7 +121,6 @@ const Analytics = () => {
 
     return (
         <div className="min-h-screen bg-background pb-6">
-            {/* Header */}
             <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
@@ -116,212 +137,213 @@ const Analytics = () => {
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="container mx-auto px-4 py-6 space-y-6">
-                {/* Time Filter */}
-                <Card className="p-4 mb-6">
-                    <h2 className="text-lg font-semibold mb-3">Filter by Time</h2>
-                    <TimeFilter
-                        selectedTime={selectedTime}
-                        onSelectTime={setSelectedTime}
-                    />
-                </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div className="lg:col-span-1 space-y-6">
+                        <Card className="p-4">
+                            <h2 className="text-lg font-semibold mb-3">Time of Day</h2>
+                            <TimeFilter
+                                selectedTime={selectedTime}
+                                onSelectTime={setSelectedTime}
+                            />
+                        </Card>
 
-                {/* Emotion Filters */}
-                <Card className="p-4">
-                    <h2 className="text-lg font-semibold mb-3">
-                        Filter by Emotion Category
-                    </h2>
+                        <Card className="p-4">
+                            <h2 className="text-lg font-semibold mb-3">
+                                Emotion Category
+                            </h2>
 
-                    {/* Good / Bad / All buttons */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        <Button
-                            size="sm"
-                            variant={polarityFilter === "all" ? "default" : "outline"}
-                            onClick={() => setPolarityFilter("all")}
-                        >
-                            All
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant={polarityFilter === "good" ? "default" : "outline"}
-                            onClick={() => setPolarityFilter("good")}
-                        >
-                            Positive
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant={polarityFilter === "bad" ? "default" : "outline"}
-                            onClick={() => setPolarityFilter("bad")}
-                        >
-                            Negative
-                        </Button>
-                    </div>
-
-                    {/* Category pair toggle (safe/unsafe, clean/dirty, etc.) */}
-                    {/* ADDED: Wrapper div for horizontal scrolling (Slider) */}
-                    <div className="w-full overflow-x-auto pb-2">
-                        <ToggleGroup
-                            type="single"
-                            value={activeEmotionCategories}
-                            onValueChange={(value) =>
-                                setActiveEmotionCategories((value || undefined) as string | undefined)
-                            }
-                            // ADDED: flex-nowrap prevents wrapping, creating the row
-                            className="flex flex-nowrap sm:flex-wrap justify-start gap-2 min-w-max sm:min-w-0"
-                        >
-                            {EMOTION_CATEGORIES.map((category) => (
-                                <ToggleGroupItem
-                                    key={category.value}
-                                    value={category.value}
-                                    aria-label={category.label}
-                                    // ADDED: flex-none (keeps size), blue background when active
-                                    className="flex-none data-[state=on]:bg-blue-600 data-[state=on]:text-white border border-input hover:bg-accent hover:text-accent-foreground whitespace-nowrap"
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                <Button
+                                    size="sm"
+                                    variant={polarityFilter === "all" ? "default" : "outline"}
+                                    onClick={() => setPolarityFilter("all")}
+                                    className={polarityFilter === "all" ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
                                 >
-                                    {category.label}
-                                </ToggleGroupItem>
-                            ))}
-                        </ToggleGroup>
-                    </div>
-                </Card>
-
-                {/* Heatmap */}
-                <div>
-                    <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-lg font-semibold">
-                            City Signals Heatmap
-                            <span className="text-sm text-muted-foreground ml-2">
-                ({filteredSignals.length} signals)
-              </span>
-                        </h2>
-                    </div>
-                    <div className="h-[400px] md:h-[600px] rounded-lg overflow-hidden border">
-                        <CityMap
-                            signals={filteredSignals}
-                            maxBounds={MUNICH_BOUNDS}
-                            minZoom={MAP_DEFAULTS.minZoom}
-                        />
-                    </div>
-                </div>
-
-                {/* Toggle Statistics Button */}
-                <div className="flex justify-center">
-                    <Button
-                        onClick={() => setShowStats(!showStats)}
-                        variant="outline"
-                        size="lg"
-                        className="gap-2"
-                    >
-                        <BarChart3 className="h-5 w-5" />
-                        {showStats ? "Hide" : "Show"} Statistics / Analytics
-                        {showStats ? (
-                            <ChevronUp className="h-4 w-4" />
-                        ) : (
-                            <ChevronDown className="h-4 w-4" />
-                        )}
-                    </Button>
-                </div>
-
-                {/* Statistics Section - Collapsible */}
-                {showStats && (
-                    <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
-                        {/* Emotion Stats Grid */}
-                        <Card className="p-6">
-                            <h3 className="font-semibold mb-4 text-lg">Signal Distribution</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {EMOTION_CATEGORIES.map((category) => (
-                                    <Card
-                                        key={category.value}
-                                        className="p-4 border-2 border-dashed border-muted-foreground/20 bg-accent/10"
-                                    >
-                                        <h4 className="font-semibold text-md mb-3 text-center">
-                                            {category.label}
-                                        </h4>
-                                        <div className="flex justify-around items-center gap-4">
-                                            {category.emotions.map((emotion) => {
-                                                const config = EMOTION_CONFIG[emotion];
-                                                const count = signals.filter(
-                                                    (s) => s.emotion === emotion
-                                                ).length;
-                                                return (
-                                                    <div
-                                                        key={emotion}
-                                                        className="flex flex-col items-center"
-                                                    >
-                                                        <p className={`text-3xl font-bold ${config.color}`}>
-                                                            {count}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {config.label}
-                                                        </p>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </Card>
-                                ))}
+                                    All
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant={polarityFilter === "positive" ? "default" : "outline"}
+                                    onClick={() => setPolarityFilter("positive")}
+                                    className={polarityFilter === "positive" ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+                                >
+                                    Positive
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant={polarityFilter === "negative" ? "default" : "outline"}
+                                    onClick={() => setPolarityFilter("negative")}
+                                    className={polarityFilter === "negative" ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+                                >
+                                    Negative
+                                </Button>
                             </div>
-                        </Card>
 
-                        {/* Time-based Analytics */}
-                        <Card className="p-6">
-                            <h3 className="font-semibold mb-4 text-lg">Time Distribution</h3>
-                            <div className="grid grid-cols-3 gap-4 text-center">
-                                <div>
-                                    <p className="text-3xl font-bold text-primary">
-                                        {signals.filter((s) => s.timeOfDay === "morning").length}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">Morning</p>
-                                </div>
-                                <div>
-                                    <p className="text-3xl font-bold text-primary">
-                                        {signals.filter((s) => s.timeOfDay === "afternoon").length}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">Afternoon</p>
-                                </div>
-                                <div>
-                                    <p className="text-3xl font-bold text-primary">
-                                        {signals.filter((s) => s.timeOfDay === "night").length}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">Night</p>
-                                </div>
-                            </div>
-                        </Card>
-
-                        {/* Overall Stats */}
-                        <Card className="p-6">
-                            <h3 className="font-semibold mb-4 text-lg">Overall Statistics</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                                    <p className="text-2xl font-bold text-primary">
-                                        {signals.length}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">Total Signals</p>
-                                </div>
-                                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                                    <p className="text-2xl font-bold text-primary">
-                                        {
-                                            new Set(
-                                                signals.map(
-                                                    (s) => `${s.location.lat},${s.location.lng}`
-                                                )
-                                            ).size
+                            <div className="space-y-4">
+                                <div className="w-full overflow-x-auto pb-2">
+                                    <ToggleGroup
+                                        type="single"
+                                        value={activeEmotionCategories}
+                                        onValueChange={(value) =>
+                                            setActiveEmotionCategories((value || undefined) as string | undefined)
                                         }
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Unique Locations
-                                    </p>
-                                </div>
-                                <div className="text-center p-4 bg-muted/50 rounded-lg col-span-2 md:col-span-1">
-                                    <p className="text-2xl font-bold text-primary">Live</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Real-Time Data
-                                    </p>
+                                        className="flex flex-nowrap sm:flex-wrap justify-start gap-2 min-w-max sm:min-w-0"
+                                    >
+                                        {EMOTION_CATEGORIES.map((category) => (
+                                            <ToggleGroupItem
+                                                key={category.value}
+                                                value={category.value}
+                                                aria-label={category.label}
+                                                className="flex-none data-[state=on]:bg-blue-600 data-[state=on]:text-white border border-input hover:bg-accent hover:text-accent-foreground whitespace-nowrap"
+                                            >
+                                                {category.label}
+                                            </ToggleGroupItem>
+                                        ))}
+                                    </ToggleGroup>
                                 </div>
                             </div>
                         </Card>
                     </div>
-                )}
+
+                    <div className="lg:col-span-3 space-y-6">
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <h2 className="text-lg font-semibold">
+                                    City Signals Heatmap
+                                    <span className="text-sm text-muted-foreground ml-2">
+                                        ({filteredSignals.length} signals found)
+                                    </span>
+                                </h2>
+                            </div>
+                            <div className="h-[500px] rounded-lg overflow-hidden border shadow-sm">
+                                <CityMap
+                                    signals={filteredSignals}
+                                    maxBounds={MUNICH_BOUNDS}
+                                    minZoom={MAP_DEFAULTS.minZoom}
+                                    variant="heatmap"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <Button
+                                onClick={() => setShowStats(!showStats)}
+                                variant="outline"
+                                size="lg"
+                                className="gap-2"
+                            >
+                                <BarChart3 className="h-5 w-5" />
+                                {showStats ? "Hide" : "Show"} Detailed Statistics
+                                {showStats ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
+
+                        {showStats && (
+                            <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
+                                <Card className="p-6">
+                                    <h3 className="font-semibold mb-4 text-lg">Signal Distribution</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {EMOTION_CATEGORIES.map((category) => (
+                                            <Card
+                                                key={category.value}
+                                                className="p-4 border-2 border-dashed border-muted-foreground/20 bg-accent/10"
+                                            >
+                                                <h4 className="font-semibold text-md mb-3 text-center">
+                                                    {category.label}
+                                                </h4>
+                                                <div className="flex justify-around items-center gap-4">
+                                                    {category.emotions.map((emotion) => {
+                                                        const config = EMOTION_CONFIG[emotion];
+                                                        const count = signals.filter(
+                                                            (s) => s.emotion === emotion
+                                                        ).length;
+                                                        return (
+                                                            <div
+                                                                key={emotion}
+                                                                className="flex flex-col items-center"
+                                                            >
+                                                                <p className={`text-3xl font-bold ${config.color}`}>
+                                                                    {count}
+                                                                </p>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {config.label}
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </Card>
+
+                                <Card className="p-6">
+                                    <h3 className="font-semibold mb-4 text-lg">Time Distribution</h3>
+                                    <div className="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <p className="text-3xl font-bold text-primary">
+                                                {signals.filter((s) => s.timeOfDay === "morning").length}
+                                            </p>
+                                            <p className="text-sm font-medium">Morning</p>
+                                            <p className="text-xs text-muted-foreground">{TIME_RANGES.morning.hours}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-3xl font-bold text-primary">
+                                                {signals.filter((s) => s.timeOfDay === "afternoon").length}
+                                            </p>
+                                            <p className="text-sm font-medium">Afternoon</p>
+                                            <p className="text-xs text-muted-foreground">{TIME_RANGES.afternoon.hours}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-3xl font-bold text-primary">
+                                                {signals.filter((s) => s.timeOfDay === "night").length}
+                                            </p>
+                                            <p className="text-sm font-medium">Night</p>
+                                            <p className="text-xs text-muted-foreground">{TIME_RANGES.night.hours}</p>
+                                        </div>
+                                    </div>
+                                </Card>
+
+                                <Card className="p-6">
+                                    <h3 className="font-semibold mb-4 text-lg">Overall Statistics</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div className="text-center p-4 bg-muted/50 rounded-lg">
+                                            <p className="text-2xl font-bold text-primary">
+                                                {signals.length}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">Total Signals</p>
+                                        </div>
+                                        <div className="text-center p-4 bg-muted/50 rounded-lg">
+                                            <p className="text-2xl font-bold text-primary">
+                                                {
+                                                    new Set(
+                                                        signals.map(
+                                                            (s) => `${s.location.lat},${s.location.lng}`
+                                                        )
+                                                    ).size
+                                                }
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Unique Locations
+                                            </p>
+                                        </div>
+                                        <div className="text-center p-4 bg-muted/50 rounded-lg col-span-2 md:col-span-1">
+                                            <p className="text-2xl font-bold text-primary">Live</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Real-Time Data
+                                            </p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </main>
         </div>
     );

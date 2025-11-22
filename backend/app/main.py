@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 import json
 
 from app.database import engine, get_db
@@ -38,10 +38,12 @@ SIGNAL_MAP = {
     "lively": ("is_lively", True),
 }
 
+
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Request.metadata.create_all)
+
 
 @app.post("/report", response_model=ReportOut)
 async def submit_report(data: ReportIn, db: AsyncSession = Depends(get_db)):
@@ -77,3 +79,27 @@ async def submit_report(data: ReportIn, db: AsyncSession = Depends(get_db)):
         raise HTTPException(500, "Failed to create report")
 
     return ReportOut(id=row[0], time=str(row[1]))
+
+@app.get("/fetch-reports")
+async def get_all_requests(db: AsyncSession = Depends(get_db)):
+    query = select(Request)
+    result = await db.execute(query)
+    rows = result.scalars().all()
+
+    # Convert SQLAlchemy models → JSON-serializable dicts
+    response = [
+        {
+            "id": r.id,
+            "time": r.time,
+            "latitude": r.latitude,
+            "longitude": r.longitude,
+            "is_safe": r.is_safe,
+            "is_clean": r.is_clean,
+            "is_accessible": r.is_accessible,
+            "is_quiet": r.is_quiet,
+            "is_uncrowded": r.is_uncrowded,
+            "is_lively": r.is_lively
+        }
+        for r in rows
+    ]
+    return response
