@@ -10,15 +10,15 @@ const Home = () => {
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Heart className="h-8 w-8 text-primary" />
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 w-auto" />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   MUCPulse
                 </h1>
-                <p className="text-xs text-muted-foreground">City Signals Project</p>
+                <p className="text-xs text-muted-foreground">Citizen Platform</p>
               </div>
-            </div>
+            </Link>
             {/* Removed the Analytics button from the navbar */}
           </div>
         </div>
@@ -29,8 +29,9 @@ const Home = () => {
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Introduction */}
           <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold">
+            <h2 className="text-4xl md:text-5xl font-bold flex items-center justify-center gap-3">
               Welcome to{" "}
+              <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 md:h-12 w-auto" />
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 MUCPulse
               </span>

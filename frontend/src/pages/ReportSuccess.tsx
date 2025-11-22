@@ -22,9 +22,7 @@ const ReportSuccess = () => {
             <Heart className="h-8 w-8 text-primary" />
             <Link to="/">
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  MUCPulse
-                </h1>
+                <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 w-auto" />
                 <p className="text-xs text-muted-foreground">Signal Submitted</p>
               </div>
             </Link>

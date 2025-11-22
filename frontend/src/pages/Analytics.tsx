@@ -11,12 +11,12 @@ import { MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"; // Import ToggleGroup components
 
 const EMOTION_CATEGORIES = [
-  { label: "Safe / Unsafe", value: "safe-unsafe", emotions: ["safe", "unsafe"] as EmotionType[] },
-  { label: "Clean / Dirty", value: "clean-dirty", emotions: ["clean", "dirty"] as EmotionType[] },
-  { label: "Accessible / Inaccessible", value: "accessible-inaccessible", emotions: ["accessible", "inaccessible"] as EmotionType[] },
-  { label: "Quiet / Noisy", value: "quiet-noisy", emotions: ["quiet", "noisy"] as EmotionType[] },
-  { label: "Uncrowded / Crowded", value: "uncrowded-crowded", emotions: ["uncrowded", "crowded"] as EmotionType[] },
-  { label: "Fun / Boring", value: "lively-boring", emotions: ["lively", "boring"] as EmotionType[] },
+  { label: "Safety", value: "safe-unsafe", emotions: ["safe", "unsafe"] as EmotionType[] },
+  { label: "Cleanliness", value: "clean-dirty", emotions: ["clean", "dirty"] as EmotionType[] },
+  { label: "Accessibility", value: "accessible-inaccessible", emotions: ["accessible", "inaccessible"] as EmotionType[] },
+  { label: "Sound", value: "quiet-noisy", emotions: ["quiet", "noisy"] as EmotionType[] },
+  { label: "Crowd", value: "uncrowded-crowded", emotions: ["uncrowded", "crowded"] as EmotionType[] },
+  { label: "Vibrancy", value: "lively-boring", emotions: ["lively", "boring"] as EmotionType[] },
 ];
 
 const Analytics = () => {
@@ -49,7 +49,7 @@ const Analytics = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <Heart className="h-8 w-8 text-primary" />
+              <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 w-auto" />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   MUCPulse
@@ -74,15 +74,15 @@ const Analytics = () => {
           <ToggleGroup 
             type="single" 
             value={activeEmotionCategories} 
-            onValueChange={(value) => setActiveEmotionCategories(value || undefined)} // Set to undefined if value is empty/null
-            className="flex flex-wrap justify-start gap-2"
+            onValueChange={(value) => setActiveEmotionCategories(value || undefined)} 
+            className="flex flex-nowrap overflow-x-auto pb-2 gap-2"
           >
             {EMOTION_CATEGORIES.map(category => (
               <ToggleGroupItem 
                 key={category.value} 
                 value={category.value} 
                 aria-label={category.label}
-                className="flex-1 sm:flex-none"
+                className="flex items-center gap-2 whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 rounded-md"
               >
                 {category.label}
               </ToggleGroupItem>
