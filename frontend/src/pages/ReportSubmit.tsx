@@ -67,19 +67,21 @@ const ReportSubmit = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Heart className="h-8 w-8 text-primary" />
-            <Link to="/">
-              <div>
-                <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 w-auto" />
-                <p className="text-xs text-muted-foreground">Report a Signal</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </header>
+        <header className="border-b bg-card/50 backdrop-blur-sm">
+            <div className="container mx-auto px-4 py-4">
+                <div className="flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-3">
+                        <img src="/logo.svg" alt="MUCPulse Logo" className="h-10 w-auto" />
+                        <div>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                                MUCPulse
+                            </h1>
+                            <p className="text-xs text-muted-foreground">Report a Signal</p>
+                        </div>
+                    </Link>
+                </div>
+            </div>
+        </header>
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col">
