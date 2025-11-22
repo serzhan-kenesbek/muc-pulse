@@ -4,20 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CityMap } from "@/components/CityMap";
 import { TimeFilter } from "@/components/TimeFilter";
-import { EmotionSignal, TimeOfDay } from "@/types/emotion";
+import { EMOTION_CONFIG, EmotionSignal, EmotionType, TimeOfDay } from "@/types/emotion";
 import { Heart, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import { generateMockSignals } from "@/data/mockSignals";
 import { MUNICH_BOUNDS, MAP_DEFAULTS } from "@/config/map";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"; // Import ToggleGroup components
+
+const EMOTION_CATEGORIES = [
+  { label: "Safe / Unsafe", value: "safe-unsafe", emotions: ["safe", "unsafe"] as EmotionType[] },
+  { label: "Clean / Dirty", value: "clean-dirty", emotions: ["clean", "dirty"] as EmotionType[] },
+  { label: "Accessible / Inaccessible", value: "accessible-inaccessible", emotions: ["accessible", "inaccessible"] as EmotionType[] },
+  { label: "Quiet / Noisy", value: "quiet-noisy", emotions: ["quiet", "noisy"] as EmotionType[] },
+  { label: "Uncrowded / Crowded", value: "uncrowded-crowded", emotions: ["uncrowded", "crowded"] as EmotionType[] },
+  { label: "Fun / Boring", value: "lively-boring", emotions: ["lively", "boring"] as EmotionType[] },
+];
 
 const Analytics = () => {
   const [signals] = useState<EmotionSignal[]>(() => generateMockSignals(50));
   const [selectedTime, setSelectedTime] = useState<TimeOfDay>("all");
   const [showStats, setShowStats] = useState(false);
+  const [activeEmotionCategories, setActiveEmotionCategories] = useState<string | undefined>(undefined); // Changed type from string[] to string | undefined
 
   const filteredSignals = useMemo(() => {
-    if (selectedTime === "all") return signals;
-    return signals.filter((signal) => signal.timeOfDay === selectedTime);
-  }, [signals, selectedTime]);
+    let currentSignals = signals;
+
+    if (selectedTime !== "all") {
+      currentSignals = currentSignals.filter((signal) => signal.timeOfDay === selectedTime);
+    }
+
+    if (activeEmotionCategories) { // Check if a category is active
+      const category = EMOTION_CATEGORIES.find(cat => cat.value === activeEmotionCategories); // Find the single active category
+      if (category) {
+        currentSignals = currentSignals.filter((signal) => category.emotions.includes(signal.emotion));
+      }
+    }
+
+    return currentSignals;
+  }, [signals, selectedTime, activeEmotionCategories]);
 
   return (
     <div className="min-h-screen bg-background pb-6">
@@ -41,9 +64,30 @@ const Analytics = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Filters/Toggles */}
-        <Card className="p-4">
+        <Card className="p-4 mb-6">
           <h2 className="text-lg font-semibold mb-3">Filter by Time</h2>
           <TimeFilter selectedTime={selectedTime} onSelectTime={setSelectedTime} />
+        </Card>
+
+        <Card className="p-4">
+          <h2 className="text-lg font-semibold mb-3">Filter by Emotion Category</h2>
+          <ToggleGroup 
+            type="single" 
+            value={activeEmotionCategories} 
+            onValueChange={(value) => setActiveEmotionCategories(value || undefined)} // Set to undefined if value is empty/null
+            className="flex flex-wrap justify-start gap-2"
+          >
+            {EMOTION_CATEGORIES.map(category => (
+              <ToggleGroupItem 
+                key={category.value} 
+                value={category.value} 
+                aria-label={category.label}
+                className="flex-1 sm:flex-none"
+              >
+                {category.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </Card>
 
         {/* Heatmap */}
@@ -90,31 +134,24 @@ const Analytics = () => {
             {/* Emotion Stats Grid */}
             <Card className="p-6">
               <h3 className="font-semibold mb-4 text-lg">Signal Distribution</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <p className="text-3xl font-bold text-emotion-happy">
-                    {signals.filter((s) => s.emotion === "happy").length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Happy</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-emotion-calm">
-                    {signals.filter((s) => s.emotion === "calm").length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Calm</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-emotion-stressed">
-                    {signals.filter((s) => s.emotion === "stressed").length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Stressed</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-emotion-sad">
-                    {signals.filter((s) => s.emotion === "sad").length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Sad</p>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {EMOTION_CATEGORIES.map((category) => (
+                  <Card key={category.value} className="p-4 border-2 border-dashed border-muted-foreground/20 bg-accent/10">
+                    <h4 className="font-semibold text-md mb-3 text-center">{category.label}</h4>
+                    <div className="flex justify-around items-center gap-4">
+                      {category.emotions.map((emotion) => {
+                        const config = EMOTION_CONFIG[emotion];
+                        const count = signals.filter((s) => s.emotion === emotion).length;
+                        return (
+                          <div key={emotion} className="flex flex-col items-center">
+                            <p className={`text-3xl font-bold ${config.color}`}>{count}</p>
+                            <p className="text-sm text-muted-foreground">{config.label}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Card>
+                ))}
               </div>
             </Card>
 

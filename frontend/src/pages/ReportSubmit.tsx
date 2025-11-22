@@ -8,24 +8,30 @@ import { toast } from "sonner";
 
 // Signal types based on wireframe
 const SIGNAL_OPTIONS = [
-  // Negative (problem signals)
-  { id: "unsafe", label: "Unsafe", icon: "AlertTriangle", color: "text-red-500" },
-  { id: "dirty", label: "Dirty", icon: "Trash2", color: "text-orange-500" },
-  { id: "broken", label: "Broken", icon: "Wrench", color: "text-amber-500" },
-  { id: "inaccessible", label: "Inaccessible", icon: "Ban", color: "text-gray-500" },
-  { id: "noisy", label: "Too Noisy", icon: "Volume2", color: "text-purple-500" },
-  { id: "dark", label: "Dark", icon: "Moon", color: "text-indigo-500" },
-  { id: "crowded", label: "Crowded", icon: "Users", color: "text-pink-500" },
-  { id: "uncomfortable", label: "Uncomfortable", icon: "Frown", color: "text-rose-500" },
-  // Positive (success signals)
-  { id: "safe", label: "Safe", icon: "Shield", color: "text-green-500" },
-  { id: "clean", label: "Clean", icon: "Sparkles", color: "text-teal-500" },
-  { id: "kid-friendly", label: "Kid-Friendly", icon: "Baby", color: "text-cyan-500" },
-  { id: "beautiful", label: "Beautiful", icon: "Heart", color: "text-pink-400" },
-  { id: "relaxing", label: "Relaxing", icon: "Coffee", color: "text-amber-400" },
-  { id: "green", label: "Green", icon: "TreePine", color: "text-emerald-500" },
-  { id: "lively", label: "Fun / Lively", icon: "PartyPopper", color: "text-yellow-500" },
-  { id: "accessible", label: "Accessible", icon: "Accessibility", color: "text-blue-500" },
+  [
+    { id: "safe", label: "Safe", icon: "ShieldCheck", color: "text-green-500" },
+    { id: "unsafe", label: "Unsafe", icon: "AlertTriangle", color: "text-red-500" },
+  ],
+  [
+    { id: "clean", label: "Clean", icon: "Sparkles", color: "text-teal-500" },
+    { id: "dirty", label: "Dirty", icon: "Trash2", color: "text-orange-500" },
+  ],
+  [
+    { id: "accessible", label: "Accessible", icon: "Accessibility", color: "text-blue-500" },
+    { id: "inaccessible", label: "Inaccessible", icon: "Ban", color: "text-gray-500" },
+  ],
+  [
+    { id: "quiet", label: "Quiet", icon: "VolumeX", color: "text-blue-400" },
+    { id: "noisy", label: "Too Noisy", icon: "Volume2", color: "text-purple-500" },
+  ],
+  [
+    { id: "uncrowded", label: "Uncrowded", icon: "PersonStanding", color: "text-cyan-500" },
+    { id: "crowded", label: "Crowded", icon: "Users", color: "text-pink-500" },
+  ],
+  [
+    { id: "lively", label: "Fun / Lively", icon: "PartyPopper", color: "text-yellow-500" },
+    { id: "boring", label: "Boring", icon: "Hourglass", color: "text-rose-500" },
+  ],
 ];
 
 const ReportSubmit = () => {
@@ -87,22 +93,28 @@ const ReportSubmit = () => {
         </div>
 
         {/* Signal Options Grid - 2 columns */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {SIGNAL_OPTIONS.map((option) => (
-            <Card
-              key={option.id}
-              className={`p-4 cursor-pointer transition-all hover:scale-105 ${
-                selectedSignal === option.id
-                  ? "ring-2 ring-primary bg-primary/5"
-                  : "hover:border-primary/50"
-              }`}
-              onClick={() => setSelectedSignal(option.id)}
-            >
-              <div className="flex flex-col items-center gap-2 text-center">
-                <div className={option.color}>
-                  {renderIcon(option.icon)}
-                </div>
-                <span className="text-sm font-medium">{option.label}</span>
+        <div className="grid grid-cols-1 gap-3 mb-6">
+          {SIGNAL_OPTIONS.map((pair, index) => (
+            <Card key={index} className="p-2 border-2 border-dashed border-muted-foreground/20 bg-accent/10">
+              <div className="flex flex-row gap-2">
+                {pair.map((option) => (
+                  <Card
+                    key={option.id}
+                    className={`flex-1 p-4 cursor-pointer transition-all hover:scale-105 ${
+                      selectedSignal === option.id
+                        ? "ring-2 ring-primary bg-primary/5"
+                        : "hover:border-primary/50"
+                    }`}
+                    onClick={() => setSelectedSignal(option.id)}
+                  >
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <div className={option.color}>
+                        {renderIcon(option.icon)}
+                      </div>
+                      <span className="text-sm font-medium">{option.label}</span>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </Card>
           ))}
