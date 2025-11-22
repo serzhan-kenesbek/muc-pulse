@@ -55,6 +55,25 @@ const ReportSubmit = () => {
     sessionStorage.setItem("reportSignal", selectedSignal);
     
     // In a real app, this would submit to backend
+    const payload = {
+    signal_type: selectedSignal,
+    location: locationStr,
+  };
+
+  fetch("http://localhost:8000/report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to submit");
+      toast.success("Report submitted!");
+      navigate("/");
+    })
+    .catch(() => {
+      toast.error("Submission failed");
+    });
+    
     toast.success("Signal submitted successfully!");
     navigate("/report/success");
   };
