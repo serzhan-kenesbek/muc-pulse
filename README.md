@@ -234,29 +234,10 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## Contributors & Acknowledgements
-
-Built with passion at **HackaTUM 2025**
-
 ### Core Team
 
 * Serzhan Kenesbek
 * Kim Ngan Nguyen
 * Lena Elisabeth Holtmannspötter
 
-Special thanks to:
-
-* HackaTUM organizers
-* Lovable AI
-* Cursor AI
-* The people of Munich
-
 ---
-
-## Final Words
-
-MUCPulse is not just a hackathon project — it is the foundation of emotional urban intelligence.
-
-A system where voices become visibility.
-Where experience becomes data.
-Where cities learn how to feel.
