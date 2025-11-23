@@ -5,9 +5,44 @@
 A living map of how Munich *feels* in real time.
 Transforming collective emotion into actionable urban intelligence.
 
-### 📸 Screenshots
+### Screenshots
 
-* Will add Sunday morning!
+<table>
+  <tr>
+    <td align="center">
+      <img src="assets/screenshot1.png" alt="Home Screen" width="250" />
+      <br />
+      <em>Home Page</em>
+    </td>
+    <td align="center">
+      <img src="assets/screenshot2.png" alt="Map Selection" width="250" />
+      <br />
+      <em>Location Selection</em>
+    </td>
+    <td align="center">
+      <img src="assets/screenshot3.png" alt="Signal Type" width="250" />
+      <br />
+      <em>Report Signal</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/screenshot6.png" alt="Success Screen" width="250" />
+      <br />
+      <em>Success State</em>
+    </td>
+    <td align="center">
+      <img src="assets/screenshot4.png" alt="Analytics Filters" width="250" />
+      <br />
+      <em>Analytics Filters</em>
+    </td>
+    <td align="center">
+      <img src="assets/screenshot5.png" alt="Stats View" width="250" />
+      <br />
+      <em>Live Statistics</em>
+    </td>
+  </tr>
+</table>
 
 ---
 
