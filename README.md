@@ -58,7 +58,7 @@ Yet while we can map every street and station with precision, we have no system 
 
 ## The Problem
 
-Urban planning is traditionally driven by structural data: traffic flow, construction density, zoning laws, and public infrastructure metrics. What’s missing is the emotional layer — how people truly experience these environments.
+Urban planning is traditionally driven by structural data: traffic flow, construction density, zoning laws, and public infrastructure metrics. What’s missing is the emotional layer - how people truly experience these environments.
 
 Questions citizens face daily have no concrete answers:
 
@@ -68,7 +68,7 @@ Questions citizens face daily have no concrete answers:
 
 Without emotional data, cities grow blind to the lived realities of their communities. This disconnect results in underused public spaces, unsafe zones, and overlooked issues that silently shape everyday life.
 
-Munich deserved a system that listens to its people — not just measures them.
+Munich deserved a system that listens to its people - not just measures them.
 
 ---
 
