@@ -193,7 +193,10 @@ npm run dev
 
 ```bash
 cd backend
-uvicorn main:app --reload
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
 ## Contributors & Acknowledgements
