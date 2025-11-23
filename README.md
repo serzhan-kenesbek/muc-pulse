@@ -5,6 +5,10 @@
 A living map of how Munich *feels* — in real time.
 Transforming collective emotion into actionable urban intelligence.
 
+### 📸 Screenshots
+
+* Will add Sunday morning!
+
 ---
 
 ## Inspiration
@@ -191,13 +195,6 @@ npm run dev
 cd backend
 uvicorn main:app --reload
 ```
-
-
-### 📸 Screenshots
-
-* Will add Sunday morning!
-
----
 
 ## Contributors & Acknowledgements
 
