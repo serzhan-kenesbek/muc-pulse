@@ -68,10 +68,11 @@ const ReportSubmit = () => {
     .then(res => {
       if (!res.ok) throw new Error("Failed to submit");
       toast.success("Report submitted!");
-      navigate("/");
+      navigate("/report/success");
     })
     .catch(() => {
       toast.error("Submission failed");
+      navigate("/report/not-found");
     });
   };
 
