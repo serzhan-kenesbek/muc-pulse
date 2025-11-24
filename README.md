@@ -167,28 +167,6 @@ A seamless bridge between emotion and infrastructure.
 
 ---
 
-## Challenges & Learnings
-
-### Ghost Map Bug
-
-React 18 Strict Mode caused double rendering and collapsing map containers. We solved this with strict ref validation and container containment strategies.
-
-### Privacy vs Precision
-
-Browser geolocation restrictions required layered user guidance and fallback logic to preserve usability without sacrificing trust.
-
-### Data Serialization
-
-Bridging snake_case backend models with camelCase frontend required building a transformation adapter layer.
-
-### What This Taught Us
-
-* Frontend-based filtering dramatically improves UX performance
-* Shared type thinking prevents runtime failure
-* Emotional transparency earns user trust
-
----
-
 ## Impact & Future Vision
 
 ### Short-Term
